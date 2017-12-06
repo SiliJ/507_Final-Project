@@ -80,5 +80,12 @@ if unique_ident in CACHE_DICTION:
 else:
     print("Making a request for new data...")
     r = make_request('https://api.yelp.com/v3/businesses/search', inquiry_param)
-
-    print(r.text)
+    # print(r.text)
+    CACHE_DICTION[unique_ident]=json.loads(r.text)
+    dumped_json_cache = json.dumps(CACHE_DICTION)
+    fw = open(CACHE_FNAME,"w")
+    fw.write(dumped_json_cache)
+    fw.close() # Close the open file
+    print(unique_ident)
+    # return CACHE_DICTION[unique_ident]
+    print ('add inquiry term')
