@@ -36,7 +36,7 @@ cur.execute("DROP TABLE IF EXISTS operation_hours")
 cur.execute("DROP TABLE IF EXISTS restaurant_list")
 cur.execute("CREATE TABLE IF NOT EXISTS restaurant_list(ID SERIAL Primary KEY,Name Text UNIQUE, RESTAURANT_ID Text UNIQUE,Rating Real,Review_count INTEGER,Distance REAL,Phone Text,Address Text,Category VARCHAR(80),Transactions VARCHAR(80),Price_range VARCHAR(40))")
 # cur.execute("CREATE TABLE IF NOT EXISTS operation_hours(restaurant_id Text references restaurant_list(ID), Monday Text,Tuesday Text,Wednesday Text,Thursday Text,Friday Text,Saturday Text, Sunday Text)")
-cur.execute("CREATE TABLE IF NOT EXISTS operation_hours(ID SERIAL Primary KEY, Weekday VARCHAR NOT NULL,start_at TIME NOT NULL,end_at TIME NOT NULL)")
+cur.execute("CREATE TABLE IF NOT EXISTS operation_hours(ID SERIAL Primary KEY, store_ID Text references restaurant_list(RESTAURANT_ID), Weekday VARCHAR NOT NULL,start_at integer,end_at integer)")
 
 
 
@@ -175,16 +175,16 @@ class Restaurant(object):
 
 def insert_restaurant_data(restaurant_data,conn,cur):
     """Inserts restaurant data and returns restaurant_ID, None if unsuccessful"""
-    sql = """INSERT INTO restaurant_list(Name,ID,Rating,Review_count,Distance,Phone,Address,Category,Transactions,Price_range) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+    sql = """INSERT INTO restaurant_list(Name,RESTAURANT_ID,Rating,Review_count,Distance,Phone,Address,Category,Transactions,Price_range) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
     cur.execute(sql,(restaurant_data['name'],restaurant_data['id'],restaurant_data['rating'],restaurant_data['review_count'],restaurant_data['distance'],restaurant_data['phone'],restaurant_data['address'],restaurant_data['category'],restaurant_data['transactions'],restaurant_data['price_range']))
     conn.commit()
     # print('restaurant_data inserted')
     return True
 
-def insert_hours_data(Weekday,start_at,end_at,conn,cur):
+def insert_hours_data(store_ID,Weekday,start,end,conn,cur):
     """Inserts restaurant operation hours, None if unsuccessful"""
-    sql = """INSERT INTO operation_hours(Weekday,start_at，end_at) VALUES(%s,%s,%s)"""
-    cur.execute(sql,(Weekday,start_at,end_at))
+    sql = """INSERT INTO operation_hours(store_ID,Weekday,start_at,end_at) VALUES(%s,%s,%s,%s)"""
+    cur.execute(sql,(store_ID,Weekday,start,end))
     conn.commit()
     return True
 
@@ -194,77 +194,71 @@ operation_time_result=[]
 for item in business_list:
     Restaurants_object=Restaurant(item)
     Restaurants_data=Restaurants_object.get_restaurant_dict()
+    print(Restaurants_data)
     # ID=Restaurants_data['id']
-    restaurant_database=insert_restaurant_data(Restaurants_data,conn,cur)
+    insert_restaurant_data(Restaurants_data,conn,cur)
 # print("date installed")
 
-    use orangisation ID to get its operation hours
+    # use orangisation ID to get its operation hours
     ID=Restaurants_data['id']
-    print(ID)
+    # # print(ID)
     hours_object=Restaurants_object.get_operation_hours()
     ID_openinginfo=hours_object['hours'][0]['open']
-    operation_time={}
-    # operation_time['Mon']=[]
-    # operation_time['Tue']=[]
-    # operation_time['Wed']=[]
-    # operation_time['Thu']=[]
-    # operation_time['Fri']=[]
-    # operation_time['Sat']=[]
-    # operation_time['Sun']=[]
-    # timetable=[]
-    # restaruant_hours={}
+    # operation_time={}
+    # # operation_time['Mon']=[]
+    # # operation_time['Tue']=[]
+    # # operation_time['Wed']=[]
+    # # operation_time['Thu']=[]
+    # # operation_time['Fri']=[]
+    # # operation_time['Sat']=[]
+    # # operation_time['Sun']=[]
+    # # timetable=[]
+    # # restaruant_hours={}
     for time in ID_openinginfo:
         if time['day']==1:
             Weekday="Monday"
-            start_at=time['start']
-            end_at=time['end']
-            opearationhrs_database=insert_hours_data(Weekday,start_at,end_at,conn,cur)
+            start=time['start']
+            end=time['end']
+            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
             # timetable.append(operation_time['Monday'])
 
         if time['day']==2:
-        #
             Weekday="Tuesday"
-            start_at=time['start']
-            end_at=time['end']
-            opearationhrs_database=insert_hours_data(Weekday,start_at,end_at,conn,cur)
+            start=time['start']
+            end=time['end']
+            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
 
         if time['day']==3:
-
             Weekday="Wednesday"
-            start_at=time['start']
-            end_at=time['end']
-            opearationhrs_database=insert_hours_data(Weekday,start_at,end_at,conn,cur)
+            start=time['start']
+            end=time['end']
+            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
 
 
         if time['day']==4:
-        #
             Weekday="Thursday"
-            start_at=time['start']
-            end_at=time['end']
-            opearationhrs_database=insert_hours_data(Weekday,start_at,end_at,conn,cur)
+            start=time['start']
+            end=time['end']
+            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
 
         if time['day']==5:
-        #
             Weekday="Friday"
-            start_at=time['start']
-            end_at=time['end']
-            opearationhrs_database=insert_hours_data(Weekday,start_at,end_at,conn,cur)
+            start=time['start']
+            end=time['end']
+            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
 
         #
         if time['day']==6:
-
             Weekday="Saturday"
-            start_at=time['start']
-            end_at=time['end']
-            opearationhrs_database=insert_hours_data(Weekday,start_at,end_at,conn,cur)
-
+            start=time['start']
+            end=time['end']
+            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
         #
         if time['day']==0:
-
             Weekday="Sunday"
-            start_at=time['start']
-            end_at=time['end']
-            opearationhrs_database=insert_hours_data(Weekday,start_at,end_at,conn,cur)
+            start=time['start']
+            end=time['end']
+            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
 
 
             # operation_time['Sun'].append(time['start']+"-"+time['end'])
