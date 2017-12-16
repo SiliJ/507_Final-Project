@@ -265,13 +265,15 @@ for item in business_list:
 
 restaurantfile.close()
 
-instruction=input('which restaurant do you like?')
+instruction=input('check the Restaurants.csv file and select the restaurant you like')
 # searchtuple=(instruction)
 # cur.execute("SELECT RESTAURANT_ID FROM restaurant_list where name=%s",(instruction,))
 # selectedID=cur.fetchall()
 # print(selectedID)
 cur.execute("SELECT Weekday, start_at, end_at FROM operation_hours INNER JOIN restaurant_list ON operation_hours.store_ID=restaurant_list.RESTAURANT_ID WHERE restaurant_list.name=%s",(instruction,))
 timetable=cur.fetchall()
+print("getting the operation time for the restaurant")
+print (timetable)
 # timetable=cur.fetchall()
 # print(timetable)
             # operation_time['Sun'].append(time['start']+"-"+time['end'])
