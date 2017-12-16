@@ -191,15 +191,18 @@ def insert_hours_data(store_ID,Weekday,start,end,conn,cur):
 # Invoke class fuction to get restaurant data and finish data insertation for restaurants
 business_list=CACHE_DICTION[unique_ident]['businesses']
 operation_time_result=[]
+restaurantfile=open("restaurants.csv","w")
+restaurantfile.write("Name,Rating,Review Number,distance,phone,address,category,transactions,price_range\n")
 for item in business_list:
     Restaurants_object=Restaurant(item)
     Restaurants_data=Restaurants_object.get_restaurant_dict()
-    print(Restaurants_data)
+    # print(Restaurants_data)
     # ID=Restaurants_data['id']
     insert_restaurant_data(Restaurants_data,conn,cur)
-# print("date installed")
+    # print("restaurant data inserted well")
+    restaurantfile.write("{},{},{},{},{},{},{},{},{}\n".format(Restaurants_data['name'],Restaurants_data['rating'],Restaurants_data['review_count'],Restaurants_data['distance'],Restaurants_data['phone'],Restaurants_data['address'],Restaurants_data['category'],Restaurants_data['transactions'],Restaurants_data['price_range']))
 
-    # use orangisation ID to get its operation hours
+    #use orangisation ID to get its operation hours
     ID=Restaurants_data['id']
     # # print(ID)
     hours_object=Restaurants_object.get_operation_hours()
@@ -260,7 +263,17 @@ for item in business_list:
             end=time['end']
             opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
 
+restaurantfile.close()
 
+instruction=input('which restaurant do you like?')
+# searchtuple=(instruction)
+# cur.execute("SELECT RESTAURANT_ID FROM restaurant_list where name=%s",(instruction,))
+# selectedID=cur.fetchall()
+# print(selectedID)
+cur.execute("SELECT Weekday, start_at, end_at FROM operation_hours INNER JOIN restaurant_list ON operation_hours.store_ID=restaurant_list.RESTAURANT_ID WHERE restaurant_list.name=%s",(instruction,))
+timetable=cur.fetchall()
+# timetable=cur.fetchall()
+# print(timetable)
             # operation_time['Sun'].append(time['start']+"-"+time['end'])
     # restaruant_hours[ID]=operation_time
 
