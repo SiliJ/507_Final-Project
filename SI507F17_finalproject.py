@@ -34,7 +34,7 @@ except:
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 cur.execute("DROP TABLE IF EXISTS operation_hours")
 cur.execute("DROP TABLE IF EXISTS restaurant_list")
-cur.execute("CREATE TABLE IF NOT EXISTS restaurant_list(ID SERIAL Primary KEY,Name Text UNIQUE, RESTAURANT_ID Text UNIQUE,Rating Real,Review_count INTEGER,Distance REAL,Phone Text,Address Text,Category VARCHAR(80),Transactions VARCHAR(80),Price_range VARCHAR(40))")
+cur.execute("CREATE TABLE IF NOT EXISTS restaurant_list(ID SERIAL Primary KEY,Name Text, RESTAURANT_ID Text UNIQUE,Rating Real,Review_count INTEGER,Distance REAL,Phone Text,Address Text,Category VARCHAR(80),Transactions VARCHAR(80),Price_range VARCHAR(40))")
 # cur.execute("CREATE TABLE IF NOT EXISTS operation_hours(restaurant_id Text references restaurant_list(ID), Monday Text,Tuesday Text,Wednesday Text,Thursday Text,Friday Text,Saturday Text, Sunday Text)")
 cur.execute("CREATE TABLE IF NOT EXISTS operation_hours(ID SERIAL Primary KEY, store_ID Text references restaurant_list(RESTAURANT_ID), Weekday VARCHAR NOT NULL,start_at integer,end_at integer)")
 
@@ -110,7 +110,7 @@ else:
     fw = open(CACHE_FNAME,"w")
     fw.write(dumped_json_cache)
     fw.close() # Close the open file
-    print(unique_ident)
+    # print(unique_ident)
     # return CACHE_DICTION[unique_ident]
     # print ('add inquiry term')
 
@@ -124,16 +124,18 @@ class Restaurant(object):
             self.distance=item['distance']
             self.phone=item['phone']
             self.address=item['location']['address1']+" "+item['location']['city']
-            categorylist=[]
+            # categorylist=[]
+            self.category=''
             for elem in item['categories']:
                 type=elem['title']
-                categorylist.append(type)
-            self.category=categorylist
-            services=[]
+                self.category=type+"/"+self.category
+            self.transactions=''
             for elem in item['transactions']:
-                service_type=elem
-                services.append(service_type)
-            self.transactions=services
+                self.transactions=elem+'/'+self.transactions
+            # self.transactions=service
+            # self.transactions=''
+            # for elem in item['transactions']:
+            #     self.transactions=self.transactions+'/'+elem
             self.price_range=item['price']
         # get resaturant data into dictionary
         def get_restaurant_dict(self):
@@ -207,16 +209,6 @@ for item in business_list:
     # # print(ID)
     hours_object=Restaurants_object.get_operation_hours()
     ID_openinginfo=hours_object['hours'][0]['open']
-    # operation_time={}
-    # # operation_time['Mon']=[]
-    # # operation_time['Tue']=[]
-    # # operation_time['Wed']=[]
-    # # operation_time['Thu']=[]
-    # # operation_time['Fri']=[]
-    # # operation_time['Sat']=[]
-    # # operation_time['Sun']=[]
-    # # timetable=[]
-    # # restaruant_hours={}
     for time in ID_openinginfo:
         if time['day']==1:
             Weekday="Monday"
@@ -262,9 +254,8 @@ for item in business_list:
             start=time['start']
             end=time['end']
             opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
-
+print("hours data inserted")
 restaurantfile.close()
-
 instruction=input('check the Restaurants.csv file and select the restaurant you like')
 # searchtuple=(instruction)
 # cur.execute("SELECT RESTAURANT_ID FROM restaurant_list where name=%s",(instruction,))
