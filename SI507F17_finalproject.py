@@ -9,6 +9,10 @@ import sys
 import psycopg2.extras
 import csv
 import os.path
+import plotly
+import plotly.plotly as py
+import plotlyconfig as config2
+from plotly.graph_objs import *
 # from flask import Flask, request, render_template
 
 # setting up basic info
@@ -206,57 +210,59 @@ for item in business_list:
 
     #use orangisation ID to get its operation hours
     ID=Restaurants_data['id']
-    # # print(ID)
+    # print(ID)
     hours_object=Restaurants_object.get_operation_hours()
-    ID_openinginfo=hours_object['hours'][0]['open']
-    for time in ID_openinginfo:
-        if time['day']==1:
-            Weekday="Monday"
-            start=time['start']
-            end=time['end']
-            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
-            # timetable.append(operation_time['Monday'])
+    # print (hours_object)
+    if 'hours' not in hours_object.keys():
+        continue
+        ID_openinginfo=hours_object['hours'][0]['open']
+        for time in ID_openinginfo:
+            if time['day']==1:
+                Weekday="Monday"
+                start=time['start']
+                end=time['end']
+                opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
+                # timetable.append(operation_time['Monday'])
 
-        if time['day']==2:
-            Weekday="Tuesday"
-            start=time['start']
-            end=time['end']
-            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
+            if time['day']==2:
+                Weekday="Tuesday"
+                start=time['start']
+                end=time['end']
+                opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
 
-        if time['day']==3:
-            Weekday="Wednesday"
-            start=time['start']
-            end=time['end']
-            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
+            if time['day']==3:
+                Weekday="Wednesday"
+                start=time['start']
+                end=time['end']
+                opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
 
 
-        if time['day']==4:
-            Weekday="Thursday"
-            start=time['start']
-            end=time['end']
-            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
+            if time['day']==4:
+                Weekday="Thursday"
+                start=time['start']
+                end=time['end']
+                opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
 
-        if time['day']==5:
-            Weekday="Friday"
-            start=time['start']
-            end=time['end']
-            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
-
-        #
-        if time['day']==6:
-            Weekday="Saturday"
-            start=time['start']
-            end=time['end']
-            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
-        #
-        if time['day']==0:
-            Weekday="Sunday"
-            start=time['start']
-            end=time['end']
-            opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
-print("hours data inserted")
+            if time['day']==5:
+                Weekday="Friday"
+                start=time['start']
+                end=time['end']
+                opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
+            #
+            if time['day']==6:
+                Weekday="Saturday"
+                start=time['start']
+                end=time['end']
+                opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
+            #
+            if time['day']==0:
+                Weekday="Sunday"
+                start=time['start']
+                end=time['end']
+                opearationhrs_database=insert_hours_data(ID,Weekday,start,end,conn,cur)
+        print("hours data inserted")
 restaurantfile.close()
-instruction=input('check the Restaurants.csv file and select the restaurant you like')
+instruction=input('check the Restaurants.csv file and type the restaurant you like')
 # searchtuple=(instruction)
 # cur.execute("SELECT RESTAURANT_ID FROM restaurant_list where name=%s",(instruction,))
 # selectedID=cur.fetchall()
@@ -265,6 +271,33 @@ cur.execute("SELECT Weekday, start_at, end_at FROM operation_hours INNER JOIN re
 timetable=cur.fetchall()
 print("getting the operation time for the restaurant")
 print (timetable)
+plotly.tools.set_credentials_file(username=config2.username, api_key=config2.api_key)
+
+weekdaylist=[]
+startlist=[]
+endlist=[]
+for item in timetable:
+    weekday=item[0]
+    weekdaylist.append(weekday)
+    starttime=item[1]
+    startlist.append(starttime)
+    endtime=item[2]
+    endlist.append(endtime)
+
+trace0_beginningtime = Scatter(
+    x=weekdaylist,
+    y=startlist
+)
+
+trace1_endingtime = Scatter(
+    x=weekdaylist,
+    y=endlist
+)
+data = Data([trace0_beginningtime,trace1_endingtime])
+
+py.plot(data, filename = 'basic-line')
+
+print ("that's the end of this programming")
 # timetable=cur.fetchall()
 # print(timetable)
             # operation_time['Sun'].append(time['start']+"-"+time['end'])
