@@ -1,2 +1,2 @@
-Client_ID=""
-Client_Secret=''
+Client_ID="z4v5y6aq-M9NgehyhNNgyg"
+Client_Secret='iV7k9DydfMP36yRVKglyzhIpVSPHwjm7qCsF3a1Rt4JyJeX7sHGp4pLkdCjyZ6u0'
